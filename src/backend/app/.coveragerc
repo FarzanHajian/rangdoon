@@ -1,0 +1,3 @@
+[run]
+source = rangdoonweb
+omit = rangdoonweb/test*
