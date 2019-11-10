@@ -1,0 +1,6 @@
+https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/
+http://www.selapa.net/swatches/colors/fileformats.php
+http://www.nomodes.com/aco.html
+
+aco files => Photoshop only
+ase files => All Adobe products

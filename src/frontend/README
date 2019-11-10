@@ -1,8 +1,8 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Rangdoon Frontend
+===========
 
-## Available Scripts
-
-In the project directory, you can run:
+The frontend application is a React project which was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+In the project directory (app/rangdoonui), you can run:
 
 ### `npm start`
 
