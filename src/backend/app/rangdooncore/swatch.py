@@ -24,13 +24,13 @@ class RgbColor(Color):
         self.blue = blue
 
     def serialize(self, buffer: bytearray, include_name: bool):
-        buffer.extend(struct.pack(">HHH", self.red, self.green, self.blue))
+        buffer.extend(struct.pack(">HHHHH", 0, self.red, self.green, self.blue, 0)) # First 0 is RGB color mode, sencond 0 is field filler
         if include_name:
             _write_string(buffer, self.name)
 
     def deserialize(self, buffer: bytes, include_name: bool):
         # todo: implement include_name
-        (self.red, self.green, self.blue) = struct.unpack(">HHH", buffer)
+        (color_mode, self.red, self.green, self.blue, _) = struct.unpack(">HHHHH", buffer)
 
 
 def write_aco(colors: list) -> bytes:
@@ -77,8 +77,8 @@ def _write_integer(buffer: bytearray, value: int, is_short_int: bool = True):
 if __name__ == "__main__":
     colors = []
     colors.append(RgbColor("Gray", 127, 127, 127))
-    colors.append(RgbColor("Blue", 0, 0, 256))
-    colors.append(RgbColor("Pink", 127, 174, 201))
+    #colors.append(RgbColor("Blue", 0, 0, 255))
+    #colors.append(RgbColor("Pink", 255, 174, 201))
 
     buffer = write_aco(colors)
     with open("d:\\swatch.aco", mode="bw") as f:
