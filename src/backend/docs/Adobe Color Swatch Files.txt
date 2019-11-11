@@ -1,6 +1,7 @@
 https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/
 http://www.selapa.net/swatches/colors/fileformats.php
 http://www.nomodes.com/aco.html
+https://www.cyotek.com/blog/reading-photoshop-color-swatch-aco-files-using-csharp
 
 aco files => Photoshop only
 ase files => All Adobe products

@@ -17,20 +17,40 @@ class Color(ABC):
 class RgbColor(Color):
     __slots__ = ['name', 'red', 'green', 'blue']
 
-    def __init__(self, name: str, red: int, green: int, blue: int):
+    def __init__(self, name: str = '', red: int = 0, green: int = 0, blue: int = 0):
         self.name = name
         self.red = red
         self.green = green
         self.blue = blue
 
     def serialize(self, buffer: bytearray, include_name: bool):
-        buffer.extend(struct.pack(">HHHHH", 0, self.red, self.green, self.blue, 0)) # First 0 is RGB color mode, sencond 0 is field filler
+        buffer.extend(
+            struct.pack(
+                ">HHHHH",
+                0,  # First 0 is RGB color mode
+                self.red*256,
+                self.green*256,
+                self.blue*256,
+                0   # Field filler
+            )
+        )
         if include_name:
             _write_string(buffer, self.name)
 
     def deserialize(self, buffer: bytes, include_name: bool):
-        # todo: implement include_name
-        (color_mode, self.red, self.green, self.blue, _) = struct.unpack(">HHHHH", buffer)
+        if include_name:
+            # todo: implement include_name
+            pass
+        else:
+            (color_mode, self.red, self.green, self.blue, _) = struct.unpack(
+                ">HHHHH",
+                buffer
+            )
+            if color_mode != 0:
+                raise Exception("Invalid color mode")
+            self.red /= 256
+            self.green /= 256
+            self.blue /= 256
 
 
 def write_aco(colors: list) -> bytes:
@@ -65,8 +85,13 @@ def _write_string(buffer: bytearray, value: str):
         _write_integer(buffer, ord(ch))
 
 
-def _read_string(buffer: bytes) -> str:
-    pass
+def _read_string(buffer: bytes, offset: int) -> (str, int):
+    (length,_) = _read_integer(buffer, offset, False)
+    result = ''
+    for i in range(0, length):
+        # Number 4 ignores length data inside the buffer
+        result += chr(_read_integer(buffer, offset+4+(i*2))[0])
+    return (result, offset + 4 + length*2)
 
 
 def _write_integer(buffer: bytearray, value: int, is_short_int: bool = True):
@@ -74,11 +99,28 @@ def _write_integer(buffer: bytearray, value: int, is_short_int: bool = True):
     buffer.extend(struct.pack(format, value))
 
 
+def _read_integer(buffer: bytes, offset: int, is_short_int: bool = True) -> (int, int):
+    (format, length) = (">H", 2) if is_short_int else (">I", 4)
+    return (struct.unpack(format, buffer[offset:offset+length])[0], offset+length)
+
+
 if __name__ == "__main__":
+    buffer = bytearray()
+    _write_string(buffer, "Farzan")
+    _write_string(buffer, "فرزان")
+    _write_integer(buffer, 12)
+    _write_integer(buffer, 120, False)
+
+    st,off = _read_string(buffer, 0)
+    st,off = _read_string(buffer, off)
+    s,off = _read_integer(buffer, off)
+    i,off = _read_integer(buffer, off, False)
+    exit()
+
     colors = []
     colors.append(RgbColor("Gray", 127, 127, 127))
-    #colors.append(RgbColor("Blue", 0, 0, 255))
-    #colors.append(RgbColor("Pink", 255, 174, 201))
+    colors.append(RgbColor("Blue", 0, 0, 255))
+    colors.append(RgbColor("Pink", 255, 174, 201))
 
     buffer = write_aco(colors)
     with open("d:\\swatch.aco", mode="bw") as f:
