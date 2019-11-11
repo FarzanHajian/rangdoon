@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import List
 import struct
 
 
@@ -38,22 +39,19 @@ class RgbColor(Color):
             _write_string(buffer, self.name)
 
     def deserialize(self, buffer: bytes, include_name: bool):
-        if include_name:
-            # todo: implement include_name
-            pass
-        else:
-            (color_mode, self.red, self.green, self.blue, _) = struct.unpack(
-                ">HHHHH",
-                buffer
-            )
-            if color_mode != 0:
-                raise Exception("Invalid color mode")
-            self.red /= 256
-            self.green /= 256
-            self.blue /= 256
+        (color_mode, self.red, self.green, self.blue, _) = struct.unpack(
+            ">HHHHH",
+            buffer
+        )
+        if color_mode != 0:
+            raise Exception("Invalid color mode")
+        self.name = _read_string(buffer, 10) if include_name else ""
+        self.red /= 256
+        self.green /= 256
+        self.blue /= 256
 
 
-def write_aco(colors: list) -> bytes:
+def write_aco(colors: List[Color]) -> bytes:
     result = bytearray()
 
     # Version 1 header
@@ -88,7 +86,8 @@ def _write_string(buffer: bytearray, value: str):
 def _read_string(buffer: bytes, offset: int) -> (str, int):
     (length, _) = _read_integer(buffer, offset, False)
     data_offset = offset+4  # Number 4 ignores length data inside the buffer
-    chars = [chr(_read_integer(buffer, data_offset+(i*2))[0]) for i in range(length)]
+    chars = [chr(_read_integer(buffer, data_offset+(i*2))[0])
+             for i in range(length)]
     return (''.join(chars), data_offset + length*2)
 
 
