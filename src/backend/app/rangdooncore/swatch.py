@@ -86,12 +86,10 @@ def _write_string(buffer: bytearray, value: str):
 
 
 def _read_string(buffer: bytes, offset: int) -> (str, int):
-    (length,_) = _read_integer(buffer, offset, False)
-    result = ''
-    for i in range(0, length):
-        # Number 4 ignores length data inside the buffer
-        result += chr(_read_integer(buffer, offset+4+(i*2))[0])
-    return (result, offset + 4 + length*2)
+    (length, _) = _read_integer(buffer, offset, False)
+    data_offset = offset+4  # Number 4 ignores length data inside the buffer
+    chars = [chr(_read_integer(buffer, data_offset+(i*2))[0]) for i in range(length)]
+    return (''.join(chars), data_offset + length*2)
 
 
 def _write_integer(buffer: bytearray, value: int, is_short_int: bool = True):
@@ -101,7 +99,8 @@ def _write_integer(buffer: bytearray, value: int, is_short_int: bool = True):
 
 def _read_integer(buffer: bytes, offset: int, is_short_int: bool = True) -> (int, int):
     (format, length) = (">H", 2) if is_short_int else (">I", 4)
-    return (struct.unpack(format, buffer[offset:offset+length])[0], offset+length)
+    new_offset = offset+length
+    return (struct.unpack(format, buffer[offset:new_offset])[0], new_offset)
 
 
 if __name__ == "__main__":
@@ -111,10 +110,10 @@ if __name__ == "__main__":
     _write_integer(buffer, 12)
     _write_integer(buffer, 120, False)
 
-    st,off = _read_string(buffer, 0)
-    st,off = _read_string(buffer, off)
-    s,off = _read_integer(buffer, off)
-    i,off = _read_integer(buffer, off, False)
+    st, off = _read_string(buffer, 0)
+    st2, off = _read_string(buffer, off)
+    s, off = _read_integer(buffer, off)
+    i, off = _read_integer(buffer, off, False)
     exit()
 
     colors = []
