@@ -18,7 +18,7 @@ class Color(ABC):
 class RgbColor(Color):
     __slots__ = ['name', 'red', 'green', 'blue']
 
-    def __init__(self, name: str = '', red: int = 0, green: int = 0, blue: int = 0):
+    def __init__(self, name: str, red: int, green: int, blue: int):
         self.name = name
         self.red = red
         self.green = green
@@ -28,28 +28,30 @@ class RgbColor(Color):
         buffer.extend(
             struct.pack(
                 ">HHHHH",
-                0,  # First 0 is RGB color mode
+                0,  # RGB color mode
                 self.red*256,
                 self.green*256,
                 self.blue*256,
-                0   # Field filler
+                0   # Always zero in RGB mode
             )
         )
         if include_name:
             _write_string(buffer, self.name)
 
-    def deserialize(self, buffer: bytes, include_name: bool) -> bool:
-        (color_mode, self.red, self.green, self.blue, _) = struct.unpack(
+    @classmethod
+    def deserialize(cls, buffer: bytes, include_name: bool) -> Color:
+        (color_mode, red, green, blue, _) = struct.unpack(
             ">HHHHH",
             buffer
         )
         if color_mode != 0:
-            return False
-        self.name = _read_string(buffer, 10) if include_name else ""
-        self.red /= 256
-        self.green /= 256
-        self.blue /= 256
-        return True
+            return None
+        return RgbColor(
+            name=_read_string(buffer, 10) if include_name else "",
+            red=red / 256,
+            green=green / 256,
+            blue=blue / 256
+        )
 
 
 def write_aco(colors: List[Color]) -> bytes:
@@ -89,9 +91,9 @@ def read_aco(aco: bytes) -> List(Color):
         # Version 2 data is not available
         # Version 1 colors
         offset -= 10 * count
-        for i in range(count):
-            color = RgbColor()
-            if not color.deserialize(aco, False):
+        for _ in range(count):
+            color = RgbColor.deserialize(aco, False)
+            if color == None:
                 raise Exception("Invalid color mode")
             result.append(color)
     else:
@@ -102,9 +104,9 @@ def read_aco(aco: bytes) -> List(Color):
         (count, offset) = _read_integer(aco, offset)
 
         # Version 2 colors
-        for i in range(count):
-            color = RgbColor()
-            if not color.deserialize(aco, True):
+        for _ in range(count):
+            color = RgbColor.deserialize(aco, True)
+            if color == None:
                 raise Exception("Invalid color mode")
             result.append(color)
 
