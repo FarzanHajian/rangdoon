@@ -38,17 +38,18 @@ class RgbColor(Color):
         if include_name:
             _write_string(buffer, self.name)
 
-    def deserialize(self, buffer: bytes, include_name: bool):
+    def deserialize(self, buffer: bytes, include_name: bool) -> bool:
         (color_mode, self.red, self.green, self.blue, _) = struct.unpack(
             ">HHHHH",
             buffer
         )
         if color_mode != 0:
-            raise Exception("Invalid color mode")
+            return False
         self.name = _read_string(buffer, 10) if include_name else ""
         self.red /= 256
         self.green /= 256
         self.blue /= 256
+        return True
 
 
 def write_aco(colors: List[Color]) -> bytes:
@@ -73,8 +74,45 @@ def write_aco(colors: List[Color]) -> bytes:
     return result
 
 
-def read_aco(aco: bytes) -> list:
-    pass
+def read_aco(aco: bytes) -> List(Color):
+    offset = 0
+
+    # Version 1 header
+    (version, offset) = _read_integer(aco, offset)
+    if version != 1:
+        _raise_read_error()
+    (count, offset) = _read_integer(aco, offset)
+
+    result = []
+    offset += 10 * count
+    if len(aco) <= offset:
+        # Version 2 data is not available
+        # Version 1 colors
+        offset -= 10 * count
+        for i in range(count):
+            color = RgbColor()
+            if not color.deserialize(aco, False):
+                raise Exception("Invalid color mode")
+            result.append(color)
+    else:
+        # Version 2 header
+        (version, offset) = _read_integer(aco, offset)
+        if version != 2:
+            _raise_read_error()
+        (count, offset) = _read_integer(aco, offset)
+
+        # Version 2 colors
+        for i in range(count):
+            color = RgbColor()
+            if not color.deserialize(aco, True):
+                raise Exception("Invalid color mode")
+            result.append(color)
+
+    return result
+
+
+def _raise_read_error(msg: str = "The swatch file is not valid"):
+    raise Exception(msg)
 
 
 def _write_string(buffer: bytearray, value: str):
