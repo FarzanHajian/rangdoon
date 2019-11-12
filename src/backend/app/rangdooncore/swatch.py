@@ -18,7 +18,7 @@ class Color(ABC):
 class RgbColor(Color):
     __slots__ = ['name', 'red', 'green', 'blue']
 
-    def __init__(self, name: str, red: int, green: int, blue: int):
+    def __init__(self, name: str = '', red: int = 0, green: int = 0, blue: int = 0):
         self.name = name
         self.red = red
         self.green = green
@@ -38,20 +38,24 @@ class RgbColor(Color):
         if include_name:
             _write_string(buffer, self.name)
 
-    @classmethod
-    def deserialize(cls, buffer: bytes, include_name: bool) -> Color:
+    def deserialize(self, buffer: bytes, include_name: bool):
         (color_mode, red, green, blue, _) = struct.unpack(
             ">HHHHH",
             buffer
         )
         if color_mode != 0:
-            return None
-        return RgbColor(
-            name=_read_string(buffer, 10) if include_name else "",
-            red=red / 256,
-            green=green / 256,
-            blue=blue / 256
-        )
+            raise Exception("Invalid color mode")
+        self.name = _read_string(buffer, 10) if include_name else ""
+        self.red = red / 256
+        self.green = green / 256
+        self.blue = blue / 256
+
+
+class ColorFactory:
+    def create_color(self, aco: bytes, offset: int) -> (Color, int):
+        # todo
+        new_offset = 0
+        return (RgbColor(), new_offset)
 
 
 def write_aco(colors: List[Color]) -> bytes:
@@ -86,15 +90,14 @@ def read_aco(aco: bytes) -> List(Color):
     (count, offset) = _read_integer(aco, offset)
 
     result = []
+    factory = ColorFactory()
     offset += 10 * count
     if len(aco) <= offset:
         # Version 2 data is not available
         # Version 1 colors
         offset -= 10 * count
         for _ in range(count):
-            color = RgbColor.deserialize(aco, False)
-            if color == None:
-                raise Exception("Invalid color mode")
+            (color, offset) = factory.create_color(aco, offset)
             result.append(color)
     else:
         # Version 2 header
@@ -105,9 +108,7 @@ def read_aco(aco: bytes) -> List(Color):
 
         # Version 2 colors
         for _ in range(count):
-            color = RgbColor.deserialize(aco, True)
-            if color == None:
-                raise Exception("Invalid color mode")
+            (color, offset) = factory.create_color(aco, offset)
             result.append(color)
 
     return result
