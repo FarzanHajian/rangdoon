@@ -11,7 +11,7 @@ class Color(ABC):
         pass
 
     @abstractmethod
-    def deserialize(self, buffer: bytes, include_name: bool):
+    def deserialize(self, buffer: bytes, offset: int, include_name: bool):
         pass
 
 
@@ -23,6 +23,9 @@ class RgbColor(Color):
         self.red = red
         self.green = green
         self.blue = blue
+
+    def __str__(self):
+        return f"RGB: {self.name} {self.red} {self.green} {self.blue}"
 
     def serialize(self, buffer: bytearray, include_name: bool):
         buffer.extend(
@@ -38,24 +41,29 @@ class RgbColor(Color):
         if include_name:
             _write_string(buffer, self.name)
 
-    def deserialize(self, buffer: bytes, include_name: bool):
+    def deserialize(self, buffer: bytes, offset: int, include_name: bool) -> int:
+        end_offset = offset+10
         (color_mode, red, green, blue, _) = struct.unpack(
             ">HHHHH",
-            buffer
+            buffer[offset:end_offset]
         )
         if color_mode != 0:
-            raise Exception("Invalid color mode")
-        self.name = _read_string(buffer, 10) if include_name else ""
-        self.red = red / 256
-        self.green = green / 256
-        self.blue = blue / 256
+            _raise_read_error("Invalid color mode")
+        (self.name, end_offset) = _read_string(
+            buffer, end_offset) if include_name else ("", end_offset)
+        self.red = int(red / 256)
+        self.green = int(green / 256)
+        self.blue = int(blue / 256)
+        return end_offset
 
 
 class ColorFactory:
-    def create_color(self, aco: bytes, offset: int) -> (Color, int):
-        # todo
-        new_offset = 0
-        return (RgbColor(), new_offset)
+    def create_color(self, aco: bytes, offset: int) -> Color:
+        (color_mode, _) = _read_integer(aco, offset)
+        if color_mode == 0:
+            return RgbColor()
+        else:
+            _raise_read_error("Invalid color mode")
 
 
 def write_aco(colors: List[Color]) -> bytes:
@@ -80,7 +88,7 @@ def write_aco(colors: List[Color]) -> bytes:
     return result
 
 
-def read_aco(aco: bytes) -> List(Color):
+def read_aco(aco: bytes) -> List[Color]:
     offset = 0
 
     # Version 1 header
@@ -97,7 +105,8 @@ def read_aco(aco: bytes) -> List(Color):
         # Version 1 colors
         offset -= 10 * count
         for _ in range(count):
-            (color, offset) = factory.create_color(aco, offset)
+            color = factory.create_color(aco, offset)
+            offset = color.deserialize(aco, offset, False)
             result.append(color)
     else:
         # Version 2 header
@@ -108,7 +117,8 @@ def read_aco(aco: bytes) -> List(Color):
 
         # Version 2 colors
         for _ in range(count):
-            (color, offset) = factory.create_color(aco, offset)
+            color = factory.create_color(aco, offset)
+            offset = color.deserialize(aco, offset, True)
             result.append(color)
 
     return result
@@ -119,16 +129,17 @@ def _raise_read_error(msg: str = "The swatch file is not valid"):
 
 
 def _write_string(buffer: bytearray, value: str):
-    _write_integer(buffer, len(value), False)
+    _write_integer(buffer, len(value)+1, False)
     for ch in value:
         _write_integer(buffer, ord(ch))
+    _write_integer(buffer, 0)
 
 
 def _read_string(buffer: bytes, offset: int) -> (str, int):
     (length, _) = _read_integer(buffer, offset, False)
     data_offset = offset+4  # Number 4 ignores length data inside the buffer
     chars = [chr(_read_integer(buffer, data_offset+(i*2))[0])
-             for i in range(length)]
+             for i in range(length-1)]
     return (''.join(chars), data_offset + length*2)
 
 
@@ -144,23 +155,29 @@ def _read_integer(buffer: bytes, offset: int, is_short_int: bool = True) -> (int
 
 
 if __name__ == "__main__":
-    buffer = bytearray()
-    _write_string(buffer, "Farzan")
-    _write_string(buffer, "فرزان")
-    _write_integer(buffer, 12)
-    _write_integer(buffer, 120, False)
+    # buffer = bytearray()
+    # _write_string(buffer, "Farzan")
+    # _write_string(buffer, "فرزان")
+    # _write_integer(buffer, 12)
+    # _write_integer(buffer, 120, False)
 
-    st, off = _read_string(buffer, 0)
-    st2, off = _read_string(buffer, off)
-    s, off = _read_integer(buffer, off)
-    i, off = _read_integer(buffer, off, False)
-    exit()
+    # st, off = _read_string(buffer, 0)
+    # st2, off = _read_string(buffer, off)
+    # s, off = _read_integer(buffer, off)
+    # i, off = _read_integer(buffer, off, False)
+    # exit()
 
-    colors = []
-    colors.append(RgbColor("Gray", 127, 127, 127))
-    colors.append(RgbColor("Blue", 0, 0, 255))
-    colors.append(RgbColor("Pink", 255, 174, 201))
+    # buffer = bytearray()
+    # colors = []
+    # colors.append(RgbColor("Gray", 127, 127, 127))
+    # colors.append(RgbColor("Blue", 0, 0, 255))
+    # colors.append(RgbColor("Pink", 255, 174, 201))
+    # buffer = write_aco(colors)
+    # with open("d:\\swatch.aco", mode="bw") as f:
+    #     f.write(buffer)
 
-    buffer = write_aco(colors)
-    with open("d:\\swatch.aco", mode="bw") as f:
-        f.write(buffer)
+    with open("D:\\Program Files\\Adobe Photoshop CC 2019\\Presets\\Color Swatches\\Web Safe Colors.aco", mode="br") as f:
+        buffer = f.read()
+    colors = read_aco(buffer)
+    for c in colors:
+        print(c)
