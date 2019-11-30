@@ -14,6 +14,8 @@ requires = [
     'pyramid_jinja2',
     'pyramid_debugtoolbar',
     'waitress',
+    'beautifulsoup4',
+    'cssutils',
 ]
 
 tests_require = [
