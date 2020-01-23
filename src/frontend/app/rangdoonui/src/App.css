@@ -1,22 +1,19 @@
-.App {
-  text-align: center;
+body {
+  /* background-color: lightyellow !important; */
 }
 
-.App-logo {
-  height: 40vmin;
+nav {
+  background-color: #0277bd;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.zoom{
+    transition: transform .2s;
 }
 
-.App-link {
-  color: #09d3ac;
+.zoom:hover{
+    transform: scale(1.1);
+}
+
+.link{
+    cursor: pointer;
 }

@@ -1,14 +1,16 @@
 from bs4 import BeautifulSoup
 from typing import List
+import os
 import re
+import uuid
 import cssutils
 from .. import swatch
 
 def extract_from_adobe_color(html: str) -> str:
     ''' Accepts an HTML from "color.adobe.com" and creates a temporary swatch file.
         The path to the swatch file is returned.  '''
-    file_path = "PATH TO FILE"
-    with open(file_path, mode="rb") as file:
+    file_path = os.path.join(".", f"{uuid.uuid1()}.aco")
+    with open(file_path, mode="wb") as file:
         file.write(swatch.write_aco(_extract_colors(html)))
     return file_path
 
