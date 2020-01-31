@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Titlebar from './Titlebar';
@@ -21,28 +21,29 @@ function ExtensionDownload() {
     return (
         <div>
             <Titlebar title="Browser Extensions" />
-
             <p>Browser extensions allow you to extract colors from Adobe color page. You can download the extension for your browser of choice.</p>
-
-                {extensions.map(e => <DownloadItem extension={e} />)}
+            {extensions.map(e => <DownloadItem key={e.name} extension={e} />)}
         </div>
     );
 }
 
-function DownloadItem(props) {
-    const { name, title, link } = props.extension;
-    const logo = `https://raw.githubusercontent.com/alrra/browser-logos/master/src/${name}/${name}_64x64.png`;
-    return (
-        <div className="link mb-2">
-            <img className="zoom mr-2" src={logo} alt={name} />{title}
-        </div>
-    );
+class DownloadItem extends Component {
+    static propTypes = {
+        extension: PropTypes.object.isRequired
+    }
+
+    render() {
+        const { name, title, link } = this.props.extension;
+        const logo = `https://raw.githubusercontent.com/alrra/browser-logos/master/src/${name}/${name}_64x64.png`;
+        return (
+            <div className="mb-2">
+                <Link to={link}>
+                    <img className="zoom mr-2" src={logo} alt={name} />{title}
+                </Link>
+            </div>
+        );
+    }
 }
 
-DownloadItem.propTypes = {
-    name: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    link: PropTypes.string.isRequired
-}
 
 export default ExtensionDownload;
