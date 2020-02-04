@@ -81,7 +81,7 @@ class ColorDetail extends Component {
     }
 }
 
-ColorDetail.propType = {
+ColorDetail.propTypes = {
     name: propTypes.string.isRequired,
     red: propTypes.number.isRequired,
     green: propTypes.number.isRequired,

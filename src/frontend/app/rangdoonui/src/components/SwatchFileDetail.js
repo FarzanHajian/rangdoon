@@ -24,7 +24,7 @@ class SwatchFileDetail extends Component {
     }
 }
 
-SwatchFileDetail.propType = {
+SwatchFileDetail.propTypes = {
     swatch: propTypes.object.isRequired
 }
 

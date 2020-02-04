@@ -1,17 +1,35 @@
 import React, { Component } from 'react'
-import ColorDetail from './ColorDetail'
+import Popup from './Popup';
+import { Modal,Button } from 'react-bootstrap';
 
 export default class Dashboard extends Component {
     onColorChanged = (e) => {
         alert(e.name);
     }
+
+    onPopupAccepted = () => {
+
+    }
+
+
     render() {
+        const body = <h1>fddfgfdgdfg</h1>;
         return (
             <div>
                 Dashboard
                 <br />
-                <ColorDetail red="12" green="100" blue="150" name="Blueish" onChanged={this.onColorChanged}></ColorDetail>
+
+                <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+                    Launch demo modal
+                </button>
+
+                <Popup body={body} show="true">
+                </Popup>
+
+
+
             </div>
         )
     }
+
 }
