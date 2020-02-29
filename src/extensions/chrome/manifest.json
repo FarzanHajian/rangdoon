@@ -1,15 +1,25 @@
 {
     "manifest_version": 2,
     "name": "Rangdoon",
-    "version": "1.0",
-  
+    "version": "1.0",  
     "description": "The project lets you play with Adobe swatch files",
+    "author": {
+        "name": "Farzan Hajian",
+        "url": "http://www.farzanhajian.com"
+    },
     "icons": {"128":"icon.png"},
   
     "browser_action": {
         "default_title":"Rangdoon",
         "default_popup":"popup.html"
     },
-  
-    "author": "Farzan Hajian"
+
+    "content_scripts": [
+		{
+			"matches": ["<all_urls>"],
+            "js": ["content.js"]
+		}
+    ],
+    
+    "permissions":["tabs"]
   }

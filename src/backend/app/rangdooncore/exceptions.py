@@ -1,0 +1,2 @@
+class SwatchException(Exception):
+    pass

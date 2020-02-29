@@ -1,6 +1,8 @@
 /***** Variables *****/
 :root {
   --primary-color: #0277bd;
+  --secondary-color: #fefefa;
+  --light-primary-color: #b7e4ff;
   --color-thumbnail-size: 15px;
 }
 
@@ -20,11 +22,16 @@ nav {
 .border {
   border-width: thick;
   border-style: solid;
-  border-color: black;
+  border-color: var(--light-primary-color);
+  border-radius: 10px;
 }
 
 .image-button {
   cursor: pointer;
+}
+
+.text-wrap {
+  overflow-wrap: break-word;
 }
 
 /***** ColorDetail *****/
@@ -61,4 +68,16 @@ nav {
 
 .color-detail-name {
   grid-area: 2 / 1 / span 1 / span 4;
+}
+
+/***** FileExplorer *****/
+.file-explorer-item{
+  width: 150px;
+  height: 150px;
+  margin:15px;
+  padding:5px;
+  background-color:var(--secondary-color);
+  text-align: center;
+  display: inline-block;
+  cursor: pointer;
 }

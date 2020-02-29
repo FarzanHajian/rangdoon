@@ -1,35 +1,59 @@
 import React, { Component } from 'react'
 import Popup from './Popup';
-import { Modal,Button } from 'react-bootstrap';
+import { Modal, Button } from 'react-bootstrap';
+import Titlebar from './Titlebar';
+import FileExplorer from './FileExplorer';
+import FileExplorerItem from './FileExplorerItem';
+import { Context, Consumer } from '../context/context';
+import { GetFileListAction } from '../context/actions';
 
 export default class Dashboard extends Component {
-    onColorChanged = (e) => {
-        alert(e.name);
+    // state = {
+    //     show: false
+    // }
+    // onColorChanged = (e) => {
+    //     alert(e.name);
+    // }
+
+    // onPopupAccepted = () => {
+
+    // }
+
+    // onShowPopup = (e) => {
+    //     this.setState({ show: true });
+    // }
+
+    componentWillMount() {
+        const {dispatch} = this.context;
+        dispatch(GetFileListAction())
     }
-
-    onPopupAccepted = () => {
-
-    }
-
 
     render() {
         const body = <h1>fddfgfdgdfg</h1>;
+
         return (
             <div>
-                Dashboard
-                <br />
+                <Titlebar title="Dashboard" />
 
-                <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+                <Consumer>
+                    {state => {
+                        const {files} = state;
+                        return <FileExplorer files={files} />
+                    }}
+                </Consumer>
+
+                {/* <button className="btn btn-primary" type="button" onClick={this.onShowPopup}>
                     Launch demo modal
                 </button>
 
-                <Popup body={body} show="true">
-                </Popup>
+                <Popup body={body} show={this.state.show}>
+                </Popup> */}
 
 
 
             </div>
         )
     }
-
 }
+
+Dashboard.contextType = Context;
