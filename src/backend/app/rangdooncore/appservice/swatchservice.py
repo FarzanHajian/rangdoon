@@ -22,7 +22,7 @@ def extract_from_adobe_color(html: str, user_id: int) -> str:
 
 
 def get_files(user_id: int) -> List[str]:
-    return [os.path.basename(i) for i in iglob(f'{_get_directory(user_id)}/*.aco')]
+    return sorted({os.path.basename(i) for i in iglob(f'{_get_directory(user_id)}/*.aco')})
 
 
 def _extract_colors(html: str) -> List[swatch.RgbColor]:
