@@ -9,7 +9,7 @@ from rangdooncore.exceptions import SwatchException
 class FileApiView:
     def __init__(self, request):
         self.request = request
-        self.user_id = 1
+        self.user_id = int(request.matchdict["userId"])
 
     @view_config(request_method="GET")
     def get_files(self):

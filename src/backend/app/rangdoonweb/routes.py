@@ -4,4 +4,4 @@ def includeme(config):
     include_api_routes(config)
 
 def include_api_routes(config):
-    config.add_route('files','/files')
+    config.add_route('files','/users/{userId}/files')

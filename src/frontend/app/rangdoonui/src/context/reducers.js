@@ -4,7 +4,7 @@ import axios from "axios";
 const fileReducer = async (state, action) => {
     switch (action.type) {
         case GET_FILE_LIST:
-            const response = await axios.get(`${state.serverAddress}/files`);
+            const response = await axios.get(`${state.serverAddress}/users/${state.userId}/files`);
             return {
                 ...state,
                 files: response.data
