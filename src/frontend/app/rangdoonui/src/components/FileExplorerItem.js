@@ -11,6 +11,7 @@ function FileExplorerItem(props) {
 }
 
 FileExplorerItem.propType = {
+    key: propTypes.string.isRequired,
     fileName: propTypes.string.isRequired,
     onClicked: propTypes.func.isRequired
 }

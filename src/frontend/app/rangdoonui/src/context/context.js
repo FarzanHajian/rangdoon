@@ -8,13 +8,13 @@ export class Provider extends Component {
         userId: 1,
         serverAddress: 'http://localhost:6543',
         files: [],
-        dispatch: this.performDispatching
+        dispatch: this.performDispatching.bind(this)
     }
 
-    performDispatching(action) {
+    async performDispatching(action) {
         let tempState = this.state;
         for (let reducer of reducers) {
-            tempState = reducer(tempState, action);
+            tempState = await reducer(tempState, action);
         }
         this.setState(tempState);
     }

@@ -6,11 +6,13 @@ import FileExplorer from './FileExplorer';
 import FileExplorerItem from './FileExplorerItem';
 import { Context, Consumer } from '../context/context';
 import { GetFileListAction } from '../context/actions';
+import Loader from 'react-loader-spinner';
 
 export default class Dashboard extends Component {
-    // state = {
-    //     show: false
-    // }
+    state = {
+        //show: false
+        isLoading: true
+    }
     // onColorChanged = (e) => {
     //     alert(e.name);
     // }
@@ -23,24 +25,31 @@ export default class Dashboard extends Component {
     //     this.setState({ show: true });
     // }
 
-    componentWillMount() {
-        const {dispatch} = this.context;
-        dispatch(GetFileListAction())
+    async componentDidMount() {
+        const { dispatch } = this.context;
+        await dispatch(GetFileListAction())
+        this.setState({ isLoading: false });
     }
 
     render() {
         const body = <h1>fddfgfdgdfg</h1>;
 
+        var files = null;
+        if (this.state.isLoading) {
+            files =
+                <Loader type="Circles" color="#0277bd" height="100" width="100" style={{ textAlign: "center" }} />
+        } else {
+            files =
+                <Consumer>
+                    {state => <FileExplorer files={state.files} />}
+                </Consumer>
+        }
+
         return (
             <div>
                 <Titlebar title="Dashboard" />
 
-                <Consumer>
-                    {state => {
-                        const {files} = state;
-                        return <FileExplorer files={files} />
-                    }}
-                </Consumer>
+                {files}
 
                 {/* <button className="btn btn-primary" type="button" onClick={this.onShowPopup}>
                     Launch demo modal

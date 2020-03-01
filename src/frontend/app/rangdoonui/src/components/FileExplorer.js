@@ -12,7 +12,7 @@ class FileExplorer extends Component {
         const { files } = this.props;
         return (
             <div>
-                {files.map((file) => (<FileExplorerItem fileName={file} onClicked={this.onItemClicked} />))}
+                {files.map((file) => (<FileExplorerItem key={file} fileName={file} onClicked={this.onItemClicked} />))}
             </div>
         )
     }

@@ -74,10 +74,11 @@ nav {
 .file-explorer-item{
   width: 150px;
   height: 150px;
-  margin:15px;
-  padding:5px;
-  background-color:var(--secondary-color);
+  margin: 15px;
+  padding: 5px;
+  background-color: var(--secondary-color);
   text-align: center;
   display: inline-block;
   cursor: pointer;
+  overflow: hidden;
 }
