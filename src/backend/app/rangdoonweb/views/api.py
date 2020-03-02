@@ -9,7 +9,8 @@ from rangdooncore.exceptions import SwatchException
 class FileApiView:
     def __init__(self, request):
         self.request = request
-        self.user_id = int(request.matchdict["userId"])
+        self.user_id = int(request.matchdict["user_id"])
+        self.file_name = request.matchdict["file_name"]
 
     @view_config(request_method="GET")
     def get_files(self):
@@ -19,7 +20,7 @@ class FileApiView:
     # def get_file(self):
     #     return swatchservice.get_files(self.user_id)
 
-    @view_config(request_method="POST")
+    @view_config(request_method="POST", accept='text/html')
     def post_file(self):
         if (body := self.request.body) != b'':
             try:
