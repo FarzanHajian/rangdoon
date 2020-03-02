@@ -3,9 +3,7 @@ def includeme(config):
     config.add_route('home', '/')
     include_api_routes(config)
 
-def include_api_routes(config):
-    config.add_route('files','/users/{user_id:\d+}/files/{file_name:.*}', pregenerator=optional_pregen)
 
-def optional_pregen(request, elements, kw):
-    kw.setdefault('file_name', '')
-    return elements, kw
+def include_api_routes(config):
+    config.add_route('files', '/users/{user_id:\d+}/files')
+    config.add_route('file', '/users/{user_id:\d+}/files/{file_name}')

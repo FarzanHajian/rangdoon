@@ -25,6 +25,10 @@ def get_files(user_id: int) -> List[str]:
     return sorted({os.path.basename(i) for i in iglob(f'{_get_directory(user_id)}/*.aco')})
 
 
+def delete_file(user_id:int, file_name:str):
+    os.remove(os.path.join(_get_directory(user_id), _normalize_file_name(file_name)))
+
+
 def _extract_colors(html: str) -> List[swatch.RgbColor]:
     try:
         result = []
@@ -53,3 +57,6 @@ def _extract_colors(html: str) -> List[swatch.RgbColor]:
 
 def _get_directory(user_id: int) -> str:
     return os.path.join(configurator.get_swatch_file_directory(), f'u{user_id}')
+
+def _normalize_file_name(file_name:str) -> str:
+    return file_name if file_name.endswith('.aco') else f'{file_name}.aco'
