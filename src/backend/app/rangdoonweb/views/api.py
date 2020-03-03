@@ -17,19 +17,20 @@ class FileApiView:
 
     @view_config(route_name='file', request_method="GET")
     def get_file(self):
-        return "sdf"
+        return swatchservice.get_file(self.user_id, self.request.matchdict['file_name'])
 
     @view_config(route_name='file', request_method="DELETE")
-    def get_file(self):
+    def delete_file(self):
         try:
-            swatchservice.delete_file(self.user_id, self.request.matchdict['file_name'])
+            swatchservice.delete_file(
+                self.user_id, self.request.matchdict['file_name'])
             return exp.HTTPOk()
         except:
             return exp.HTTPInternalServerError()
 
     @view_config(request_method="POST", accept='text/html')
     def post_file(self):
-        if (body := self.request.body) != b'':
+        if (body:= self.request.body) != b'':
             try:
                 file = swatchservice.extract_from_adobe_color(body, self.user_id)
                 return exp.HTTPCreated(body=file)

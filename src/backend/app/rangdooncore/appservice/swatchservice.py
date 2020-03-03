@@ -3,7 +3,7 @@ import re
 import uuid
 import cssutils
 from bs4 import BeautifulSoup
-from typing import List
+from typing import List, Dict, Any
 from glob import iglob
 from .. import swatch
 from .. import configurator
@@ -25,8 +25,24 @@ def get_files(user_id: int) -> List[str]:
     return sorted({os.path.basename(i) for i in iglob(f'{_get_directory(user_id)}/*.aco')})
 
 
-def delete_file(user_id:int, file_name:str):
-    os.remove(os.path.join(_get_directory(user_id), _normalize_file_name(file_name)))
+def get_file(user_id: int, file_name: str) -> Dict[str, Any]:
+    file_name = _normalize_file_name(file_name)
+    file_path = os.path.join(_get_directory(user_id), file_name)
+    result = {'name': file_name, 'colors': []}
+
+    if os.path.exists(file_path):
+        with open(file_path, mode="rb") as file:
+            content = file.read()
+        colors = swatch.read_aco(content)
+        result['colors'].extend(colors)
+    return result
+
+
+def delete_file(user_id: int, file_name: str) -> None:
+    file = os.path.join(_get_directory(user_id),
+                        _normalize_file_name(file_name))
+    if os.path.exists(file):
+        os.remove(file)
 
 
 def _extract_colors(html: str) -> List[swatch.RgbColor]:
@@ -58,5 +74,6 @@ def _extract_colors(html: str) -> List[swatch.RgbColor]:
 def _get_directory(user_id: int) -> str:
     return os.path.join(configurator.get_swatch_file_directory(), f'u{user_id}')
 
-def _normalize_file_name(file_name:str) -> str:
+
+def _normalize_file_name(file_name: str) -> str:
     return file_name if file_name.endswith('.aco') else f'{file_name}.aco'

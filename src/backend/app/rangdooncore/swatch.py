@@ -66,6 +66,14 @@ class ColorFactory:
             _raise_read_error("Invalid color mode")
 
 
+class SwatchFile:
+    __slots__ = ['name', 'colors']
+
+    def __init__(self, name: str, colors: List[Color]):
+        self.name = name
+        self.colors = colors
+
+
 def write_aco(colors: List[Color]) -> bytes:
     result = bytearray()
 
