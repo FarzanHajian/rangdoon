@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Dict, Any
 import struct
 
 
@@ -7,12 +7,15 @@ class Color(ABC):
     __slots__ = ['name']
 
     @abstractmethod
-    def serialize(self, buffer: bytearray, include_name: bool):
+    def serialize(self, buffer: bytearray, include_name: bool) -> None:
         pass
 
     @abstractmethod
-    def deserialize(self, buffer: bytes, offset: int, include_name: bool):
+    def deserialize(self, buffer: bytes, offset: int, include_name: bool) -> int:
         pass
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {attr: self.__getattribute__(attr) for attr in self.__slots__}
 
 
 class RgbColor(Color):
@@ -27,7 +30,7 @@ class RgbColor(Color):
     def __str__(self):
         return f"RGB: {self.name} {self.red} {self.green} {self.blue}"
 
-    def serialize(self, buffer: bytearray, include_name: bool):
+    def serialize(self, buffer: bytearray, include_name: bool) -> None:
         buffer.extend(
             struct.pack(
                 ">HHHHH",
@@ -64,14 +67,6 @@ class ColorFactory:
             return RgbColor()
         else:
             _raise_read_error("Invalid color mode")
-
-
-class SwatchFile:
-    __slots__ = ['name', 'colors']
-
-    def __init__(self, name: str, colors: List[Color]):
-        self.name = name
-        self.colors = colors
 
 
 def write_aco(colors: List[Color]) -> bytes:
