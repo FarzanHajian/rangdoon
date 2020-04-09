@@ -5,20 +5,18 @@ class SwatchFileDetail extends Component {
     constructor(props) {
         super(props)
 
-        this.setStateByProps();
-    }
-
-    setStateByProps = () => {
         this.state = {
-            name = this.props.name,
-            colors: [...this.props.colors]
+            name: this.props.swatch.name,
+            colors: [...this.props.swatch.colors]
         }
     }
 
     render() {
         return (
             <div>
-
+                <h6>{this.state.name}</h6>
+                <div style={{display:"flex"}}>{this.state.name} has {this.state.colors.length} color(s)</div>
+                
             </div>
         )
     }

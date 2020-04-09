@@ -7,7 +7,8 @@ export class Provider extends Component {
     state = {
         userId: 1,
         serverAddress: 'http://localhost:6543',
-        files: [],
+        swatches: [],
+        currentSwatch: null,
         dispatch: this.performDispatching.bind(this)
     }
 

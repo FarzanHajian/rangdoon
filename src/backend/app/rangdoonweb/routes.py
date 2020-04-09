@@ -5,5 +5,6 @@ def includeme(config):
 
 
 def include_api_routes(config):
-    config.add_route('files', '/users/{user_id:\d+}/files')
-    config.add_route('file', '/users/{user_id:\d+}/files/{file_name}')
+    config.add_route('swatches', '/users/{user_id:\d+}/swatches')
+    config.add_route('swatch', '/users/{user_id:\d+}/swatches/{swatch_name}')
+    config.add_route('swatch_rename', '/users/{user_id:\d+}/swatches/{swatch_name}/rename')

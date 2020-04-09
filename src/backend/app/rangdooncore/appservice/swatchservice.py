@@ -3,11 +3,11 @@ import re
 import uuid
 import cssutils
 from bs4 import BeautifulSoup
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 from glob import iglob
 from .. import swatch
 from .. import configurator
-from ..exceptions import SwatchException
+from ..exceptions import SwatchException, DuplicateFile
 
 
 def extract_from_adobe_color(html: str, user_id: int) -> str:
@@ -21,16 +21,18 @@ def extract_from_adobe_color(html: str, user_id: int) -> str:
     return file_name
 
 
-def get_files(user_id: int) -> List[str]:
-    return sorted({os.path.basename(i) for i in iglob(f'{_get_directory(user_id)}/*.aco')})
+def get_swatch_names(user_id: int) -> List[str]:
+    files = {os.path.splitext(os.path.basename(i))[0] for i in iglob(
+        f'{_get_directory(user_id)}/*.aco')}
+    return sorted(files)
 
 
-def get_file(user_id: int, file_name: str) -> Dict[str, Any]:
-    file_name = _normalize_file_name(file_name)
-    file_path = os.path.join(_get_directory(user_id), file_name)
-    result = {'name': file_name, 'colors': []}
+def get_swatch(user_id: int, swatch_name: str) -> Dict[str, Any]:
+    file_name, file_path = _get_file_by_swatch(user_id, swatch_name)
+    result = None
 
     if os.path.exists(file_path):
+        result = {'name': swatch_name, 'colors': []}
         with open(file_path, mode="rb") as file:
             content = file.read()
         colors = swatch.read_aco(content)
@@ -38,11 +40,26 @@ def get_file(user_id: int, file_name: str) -> Dict[str, Any]:
     return result
 
 
-def delete_file(user_id: int, file_name: str) -> None:
-    file = os.path.join(_get_directory(user_id),
-                        _normalize_file_name(file_name))
-    if os.path.exists(file):
-        os.remove(file)
+def delete_swatch(user_id: int, swatch_name: str) -> bool:
+    _, file_path = _get_file_by_swatch(user_id, swatch_name)
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        return True
+    else:
+        return False
+
+
+def rename_swatch(user_id: int, swatch_name: str, new_name: str) -> bool:
+    _, file_path = _get_file_by_swatch(user_id, swatch_name)
+    if os.path.exists(file_path):
+        _, new_file_path = _get_file_by_swatch(user_id, new_name)
+        if os.path.exists(new_file_path):
+            raise DuplicateFile
+        else:
+            os.rename(file_path, new_file_path)
+            return True
+    else:
+        return False
 
 
 def _extract_colors(html: str) -> List[swatch.RgbColor]:
@@ -75,5 +92,8 @@ def _get_directory(user_id: int) -> str:
     return os.path.join(configurator.get_swatch_file_directory(), f'u{user_id}')
 
 
-def _normalize_file_name(file_name: str) -> str:
-    return file_name if file_name.endswith('.aco') else f'{file_name}.aco'
+def _get_file_by_swatch(user_id: int, swatch_name: str) -> Tuple[str, str]:
+    file_name = swatch_name if swatch_name.endswith(
+        '.aco') else f'{swatch_name}.aco'
+    file_path = os.path.join(_get_directory(user_id), file_name)
+    return (file_name, file_path)
