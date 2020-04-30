@@ -27,7 +27,7 @@ class SwatchApiView:
             deleted = swatchservice.delete_swatch(
                 self.user_id,
                 self.request.matchdict['swatch_name'])
-            return exp.HTTPOk() if deleted else exp.HTTPNotFound
+            return exp.HTTPOk() if deleted else exp.HTTPNotFound()
         except:
             return exp.HTTPInternalServerError()
 

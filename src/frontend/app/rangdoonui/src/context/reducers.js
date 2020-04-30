@@ -1,4 +1,4 @@
-import { GET_SWATCH_LIST, GET_SWATCH, CLEAR_CURRENT_SWATCH } from './actions';
+import { GET_SWATCH_LIST, GET_SWATCH, DELETE_SWATCH, CLEAR_CURRENT_SWATCH } from './actions';
 import axios from "axios";
 
 const swatchReducer = async (state, action) => {
@@ -17,6 +17,13 @@ const swatchReducer = async (state, action) => {
             return {
                 ...state,
                 currentSwatch: response.data
+            };
+
+        case DELETE_SWATCH:
+            response = await axios.delete(`${state.serverAddress}/users/${state.userId}/swatches/${action.payload}`);
+            return {
+                ...state,
+                swatches: state.swatches.filter(s=>s !== action.payload)
             };
 
         case CLEAR_CURRENT_SWATCH:
