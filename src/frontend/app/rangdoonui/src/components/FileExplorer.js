@@ -41,7 +41,7 @@ class FileExplorer extends Component {
         const { swatches } = this.props;
         const { showSwatchDetail } = this.state;
         const body = showSwatchDetail ? <SwatchFileDetail swatch={this.context.currentSwatch} onDeleted={this.onPopupDeleted} /> : null;
-        const header = showSwatchDetail ? `${this.context.currentSwatch.name}` : null;
+        const header = showSwatchDetail ? `Details of ${this.context.currentSwatch.name}` : null;
 
         return (
             <div>

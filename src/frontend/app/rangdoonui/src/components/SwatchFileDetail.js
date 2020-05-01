@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import propTypes from 'prop-types';
-import {DeleteSwatchAction} from "../context/actions"
+import { DeleteSwatchAction } from "../context/actions"
 import { Context } from '../context/context';
+import ColorDetail from './ColorDetail';
 
 class SwatchFileDetail extends Component {
     constructor(props) {
@@ -21,11 +22,20 @@ class SwatchFileDetail extends Component {
     }
 
     render() {
+        const { name, colors } = this.state;
         return (
             <div>
-                <h6>{this.state.name}</h6>
-                <div style={{display:"flex"}}>{this.state.name} has {this.state.colors.length} color(s)</div>
-                <button className="btn btn-danger" style={{float:"right"}} onClick={this.onDeleteClicked}>Delete</button>
+                <h6>{name}</h6>
+
+                <div className="row swatch-file-detail-container">
+                    {
+                        colors.map((color) => {
+                            const { name, red, green, blue } = color;
+                            return (<ColorDetail name={name}  red = {red} green = {green} blue = {blue} />);
+                        })
+                    }
+                </div>
+                <button className="btn btn-danger" style={{ float: "right" }} onClick={this.onDeleteClicked}>Delete Swatch</button>
             </div>
         )
     }
