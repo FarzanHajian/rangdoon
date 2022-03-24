@@ -34,6 +34,30 @@ nav {
   overflow-wrap: break-word;
 }
 
+/***** EditButton *****/
+.edit-button-container {
+  display: inline-grid;
+  grid-template-columns:
+    var(--color-thumbnail-size)
+    var(--color-thumbnail-size);
+  grid-template-rows: var(--color-thumbnail-size);
+  grid-gap: 5px;
+}
+
+.edit-button-edit {
+  grid-area: 1 / 2 / span 1 / span 1;
+}
+
+.edit-button-cancel {
+  grid-area: 1 / 1 / span 1 / span 1;
+}
+
+/***** TextEditor *****/
+.text-editor-text {
+  display: inline;
+  min-width: 50px;
+}
+
 /***** ColorDetail *****/
 .color-detail-container {
   width: 160px;
@@ -45,7 +69,9 @@ nav {
     100px
     var(--color-thumbnail-size)
     var(--color-thumbnail-size);
-  grid-template-rows: var(--color-thumbnail-size) auto;
+  grid-template-rows:
+    var(--color-thumbnail-size)
+    auto;
   grid-gap: 5px;
 }
 

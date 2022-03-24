@@ -3,6 +3,7 @@ import propTypes from 'prop-types';
 import { DeleteSwatchAction } from "../context/actions"
 import { Context } from '../context/context';
 import ColorDetail from './ColorDetail';
+import TextEditor from './TextEditor';
 
 class SwatchFileDetail extends Component {
     constructor(props) {
@@ -21,17 +22,22 @@ class SwatchFileDetail extends Component {
         this.props.onDeleted(name);
     }
 
+    onNameEdited = async (name) => {
+        alert(name)
+    }
+
     render() {
         const { name, colors } = this.state;
         return (
             <div>
-                <h6>{name}</h6>
-
+                <div className="row" style={{ margin: "10px 10px 30px 10px" }} >
+                    <TextEditor initialText={name} onEdit={this.onNameEdited} />
+                </div>
                 <div className="row swatch-file-detail-container">
                     {
                         colors.map((color) => {
                             const { name, red, green, blue } = color;
-                            return (<ColorDetail name={name}  red = {red} green = {green} blue = {blue} />);
+                            return (<ColorDetail key={name} name={name} red={red} green={green} blue={blue} />);
                         })
                     }
                 </div>
